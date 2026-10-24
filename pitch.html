@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tutor de Corte de Rosas · Pitch</title>
+<style>
+:root{--bg:#0d1a12;--fg:#f3f7f1;--rosa:#e0457b;--verde:#6fcf7f;--tenue:#9db3a3;--card:#16281c;--linea:#25402e;--ambar:#f2c14e;color-scheme:dark}
+*{box-sizing:border-box;margin:0}
+html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--fg);font:clamp(15px,1.55vw,22px)/1.45 "Segoe UI",system-ui,sans-serif}
+body::before{content:"";position:fixed;inset:0;background:radial-gradient(60vw 60vw at 85% 10%,#e0457b22,transparent 60%),radial-gradient(50vw 50vw at 5% 95%,#6fcf7f1c,transparent 60%)}
+.slide{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;padding:7vh 8vw 10vh;opacity:0;visibility:hidden;transform:translateX(7%) scale(.98);filter:blur(8px);transition:opacity .7s,transform .8s cubic-bezier(.2,.8,.2,1),filter .7s,visibility 0s .8s}
+.slide.prev{transform:translateX(-7%) scale(.98)}
+.slide.active{opacity:1;visibility:visible;transform:none;filter:none;transition-delay:0s}
+.rv{opacity:0;transform:translateY(26px);transition:opacity .7s,transform .8s cubic-bezier(.2,.8,.2,1)}
+.active .rv{opacity:1;transform:none;transition-delay:calc(var(--i)*.13s + .3s)}
+h1{font-size:clamp(2.4rem,6.4vw,5.4rem);line-height:1.04;letter-spacing:-.02em}
+h2{font-size:clamp(1.8rem,4vw,3.2rem);line-height:1.1;margin-bottom:.5em;letter-spacing:-.01em}
+.k{color:var(--rosa);font-weight:700;letter-spacing:.14em;text-transform:uppercase;font-size:.7em;margin-bottom:1em}
+.sub{color:var(--tenue);max-width:42em;margin-top:1em}
+.rosa{color:var(--rosa)}.verde{color:var(--verde)}
+.grid{display:grid;gap:1.4vw;grid-template-columns:repeat(auto-fit,minmax(15em,1fr));margin-top:.8em}
+.card{background:var(--card);border:1px solid var(--linea);border-radius:18px;padding:1.2em 1.3em}
+.card h3{font-size:1.15em;margin-bottom:.35em}.card p,.card li{color:var(--tenue);font-size:.88em}
+.card ul{padding-left:1.1em}
+.num{display:inline-grid;place-items:center;width:2em;height:2em;border-radius:50%;background:var(--rosa);color:#fff;font-weight:700;margin-bottom:.5em}
+.chip{display:inline-block;font-size:.62em;font-weight:700;padding:.25em .8em;border-radius:99px;margin:.5em .4em 0 0;letter-spacing:.04em}
+.ok{background:#6fcf7f26;color:var(--verde);border:1px solid #6fcf7f66}.dis{background:#f2c14e22;color:var(--ambar);border:1px solid #f2c14e66}
+.pend{background:#f2c14e;color:#111;padding:0 .3em;border-radius:4px}
+.pasos{display:flex;flex-direction:column;gap:.55em;margin-top:.6em;counter-reset:p}
+.pasos div{counter-increment:p;display:flex;gap:.8em;align-items:center;background:var(--card);border:1px solid var(--linea);border-radius:14px;padding:.6em 1em}
+.pasos div::before{content:counter(p);flex:none;display:grid;place-items:center;width:1.7em;height:1.7em;border-radius:50%;background:var(--rosa);font-weight:700;font-size:.85em}
+.flujo{display:flex;align-items:stretch;gap:1vw}.flujo .card{flex:1}.flecha{align-self:center;font-size:2em;color:var(--rosa);animation:mov 1.6s ease-in-out infinite}
+@keyframes mov{50%{transform:translateX(8px)}}
+.dos{display:grid;grid-template-columns:1fr 1fr;gap:2vw;align-items:center}
+.cierre{text-align:center;align-items:center}.cierre h1{max-width:12em}
+#cabeza{position:fixed;left:0;right:0;top:0;height:5px;background:#ffffff14;z-index:5}#barra{height:100%;width:0;background:linear-gradient(90deg,var(--verde),var(--rosa));transition:width .6s}
+#nav{position:fixed;bottom:2.2vh;left:50%;transform:translateX(-50%);display:flex;gap:.6em;align-items:center;z-index:5}
+#nav button{background:#ffffff14;color:var(--fg);border:1px solid var(--linea);border-radius:99px;width:2.6em;height:2.6em;font-size:1em;cursor:pointer}
+#nav button:hover{background:var(--rosa)}.pt{width:.6em;height:.6em;border-radius:50%;background:#ffffff33;cursor:pointer;transition:.3s}.pt.on{background:var(--rosa);width:1.6em;border-radius:99px}
+#notas{position:fixed;left:2vw;right:2vw;bottom:9vh;background:#000d;border:1px solid var(--linea);border-radius:14px;padding:1em 1.3em;font-size:.8em;z-index:6;display:none}
+#notas.on{display:block}#ayuda{position:fixed;right:1.5vw;bottom:2.6vh;color:var(--tenue);font-size:.6em;z-index:5}
+svg text{font:600 15px "Segoe UI",sans-serif;fill:#f3f7f1}
+.corte{stroke-dasharray:300;stroke-dashoffset:300}.active .corte{animation:trazo 1s .8s forwards}@keyframes trazo{to{stroke-dashoffset:0}}
+@media (max-width:800px){.dos,.flujo{grid-template-columns:1fr;flex-direction:column}.flecha{transform:rotate(90deg)}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}.corte{stroke-dashoffset:0}}
+</style>
+</head>
+<body>
+<div id="cabeza"><div id="barra"></div></div>
+
+<section class="slide" data-nota="Abrir con calma. Idea fuerza: tecnología como acompañante, nunca como reemplazo. Presentar el nombre del equipo.">
+  <div class="k rv">Reto · Robot capacitador para el corte de flores</div>
+  <h1 class="rv">Tutor de Corte<br>de <span class="rosa">Rosas</span></h1>
+  <p class="sub rv">Un acompañante que enseña al campesino a decidir cuándo y cómo cortar, y que le ayuda a entender sus errores para mejorar.</p>
+  <p class="rv" style="margin-top:1.4em"><strong class="verde">El robot y la tecnología acompañan. Nunca reemplazan al trabajador.</strong></p>
+  <p class="sub rv" style="font-size:.75em">Equipo: <span class="pend">[nombre del equipo]</span></p>
+</section>
+
+<section class="slide" data-nota="Mostrar que entendimos el reto: no es solo reconocer una flor, es capacitar a una persona respetando su contexto.">
+  <div class="k rv">Lo que entendimos del reto</div>
+  <h2 class="rv">Capacitar, no solo detectar</h2>
+  <div class="dos">
+    <div class="card rv"><h3>Qué pide el reto</h3><ul><li>Un robot que capacite al campesino a cortar bien</li><li>Entender sus limitaciones</li><li>Entender cómo funciona su entorno</li></ul></div>
+    <div class="card rv"><h3 class="verde">Cómo respondemos</h3><ul><li>Tres fases: aprender, practicar y ser supervisado</li><li>Funciona sin internet, donde el campo lo exige</li><li>Un entorno realista, con la luz de la hora real</li></ul></div>
+  </div>
+</section>
+
+<section class="slide" data-nota="Recorrer las tres fases como una ruta de aprendizaje. Aclarar con honestidad qué ya funciona en la demo y qué está diseñado.">
+  <div class="k rv">Nuestra propuesta</div>
+  <h2 class="rv">Tres fases, una sola ruta de aprendizaje</h2>
+  <div class="flujo">
+    <div class="card rv"><div class="num">1</div><h3>Aprender</h3><p>Herramientas, métodos de corte, tipos de flor y sus partes.</p><span class="chip dis">Diseñada</span></div>
+    <div class="flecha rv">→</div>
+    <div class="card rv"><div class="num">2</div><h3>Practicar en realidad virtual</h3><p>Decide si la rosa está lista y aprende de cada respuesta.</p><span class="chip ok">Prototipo funcionando</span></div>
+    <div class="flecha rv">→</div>
+    <div class="card rv"><div class="num">3</div><h3>Ser supervisado por el robot</h3><p>Muestra la rosa recién cortada y recibe su evaluación.</p><span class="chip dis">Diseñada</span></div>
+  </div>
+</section>
+
+<section class="slide" data-nota="La fase 1 le da el vocabulario y los criterios que luego usa en la fase 2. Sin esa base, la práctica sería adivinar.">
+  <div class="k rv">Fase 1 · Aprender</div>
+  <h2 class="rv">El primer acercamiento: conocer antes de cortar</h2>
+  <div class="grid">
+    <div class="card rv"><h3>Herramientas</h3><p>Cuáles usar y cómo cuidarlas.</p></div>
+    <div class="card rv"><h3>Métodos de corte</h3><p>Cómo y dónde cortar el tallo.</p></div>
+    <div class="card rv"><h3>Las flores</h3><p>Diferencias entre los tipos de flor.</p></div>
+    <div class="card rv"><h3>Partes de la flor</h3><p>Tallo, hojas, sépalos, pétalos y botón.</p></div>
+  </div>
+</section>
+
+<section class="slide" data-nota="Aquí va la demostración en vivo: caminar, ver cómo la rosa sale de la foto, escuchar la explicación, responder por voz. Si algo falla, hay video de respaldo.">
+  <div class="k rv">Fase 2 · Practicar en realidad virtual</div>
+  <h2 class="rv">Caminar por el cultivo y decidir</h2>
+  <div class="pasos">
+    <div class="rv">Camina por el sendero y encuentra una rosa</div>
+    <div class="rv">La rosa sale de la foto en 3D y gira para verla de cerca</div>
+    <div class="rv">Se señalan sus partes mientras la voz las explica</div>
+    <div class="rv">Responde por voz: «¿Está lista para el corte?»</div>
+    <div class="rv">Recibe retroalimentación en cada parte del recorrido</div>
+  </div>
+  <p class="rv"><span class="chip ok">Voz sin internet</span><span class="chip ok">Rosas 3D</span><span class="chip ok">Lección guiada</span><span class="chip dis">Hora real de Bogotá: en construcción</span></p>
+</section>
+
+<section class="slide" data-nota="Diferencial central: no basta con aprobar, hay que entender el error. Y la empresa puede ver dónde fallan sus trabajadores, con datos reales en Excel.">
+  <div class="k rv">Fase 2 · Acompañar y medir</div>
+  <h2 class="rv">No solo completar la prueba: entender el error</h2>
+  <div class="dos">
+    <div class="card rv"><h3>Para el campesino</h3><ul><li>Su resultado y en qué falló</li><li>Si cortó <strong>antes de tiempo</strong> o <strong>dejó pasar</strong> una rosa lista</li><li>La regla que debe recordar</li><li>Un plan de acción para mejorar</li></ul></div>
+    <div class="card rv"><h3 class="verde">Para la empresa</h3><ul><li>Cada respuesta se guarda en un archivo Excel</li><li>Tiempo de decisión, aciertos y tipo de error</li><li>Informe por trabajador</li><li>Se ve dónde reforzar la capacitación</li></ul></div>
+  </div>
+</section>
+
+<section class="slide" data-nota="Hacer sentir la consecuencia: un mal corte no solo daña esa rosa, también la siguiente. Eso vuelve consciente al campesino de su decisión.">
+  <div class="k rv">Fase 2 · Ver las consecuencias</div>
+  <h2 class="rv">Cada corte tiene un resultado</h2>
+  <div class="dos">
+    <svg class="rv" viewBox="0 0 260 300" style="width:100%;max-height:52vh">
+      <ellipse cx="130" cy="42" rx="34" ry="30" fill="#e0457b"/><rect x="127" y="70" width="6" height="210" fill="#3d8f4a"/>
+      <ellipse cx="108" cy="150" rx="24" ry="9" fill="#3d8f4a" transform="rotate(-25 108 150)"/>
+      <line class="corte" x1="70" y1="105" x2="190" y2="105" stroke="#e5646a" stroke-width="3" stroke-dasharray="6 5"/><text x="195" y="109" fill="#e5646a">Corte equivocado</text>
+      <line class="corte" x1="70" y1="170" x2="190" y2="170" stroke="#6fcf7f" stroke-width="4"/><text x="195" y="174" style="fill:#6fcf7f">Corte correcto</text>
+      <line class="corte" x1="70" y1="235" x2="190" y2="235" stroke="#e5646a" stroke-width="3" stroke-dasharray="6 5"/><text x="195" y="239" fill="#e5646a">Corte equivocado</text>
+    </svg>
+    <div>
+      <div class="card rv" style="border-color:#6fcf7f66"><h3 class="verde">Corte correcto</h3><p>La altura correcta queda en verde y se muestra el proceso: la rosa se abre y la planta sigue.</p></div>
+      <div class="card rv" style="margin-top:1vh"><h3>Corte mal hecho</h3><p>La rosa no se va a abrir.</p></div>
+      <div class="card rv" style="margin-top:1vh"><h3>Corte mal hecho en el tallo</h3><p>El nuevo tallo no sale.</p></div>
+    </div>
+  </div>
+  <p class="sub rv" style="font-size:.7em">Ilustración: la posición de las líneas es referencial. <span class="chip dis">Diseñada</span></p>
+</section>
+
+<section class="slide" data-nota="El robot como supervisor, nunca como reemplazo: evalúa el trabajo ya hecho y graba para dar una retroalimentación que el campesino pueda revisar.">
+  <div class="k rv">Fase 3 · El robot supervisor</div>
+  <h2 class="rv">Muéstrale tu corte</h2>
+  <div class="pasos">
+    <div class="rv">El campesino le muestra al robot la rosa recién cortada</div>
+    <div class="rv">El robot le dice si el corte está bien o no, y por qué</div>
+    <div class="rv">Graba el proceso para dar retroalimentación sobre cómo trabaja</div>
+  </div>
+  <p class="sub rv">Un guía que acompaña y explica. La decisión y el oficio siguen siendo del campesino.</p>
+  <p class="rv"><span class="chip dis">Diseñada</span></p>
+</section>
+
+<section class="slide" data-nota="Cerrar la comparación: qué nos distingue. Mencionar con transparencia los límites del prototipo; el jurado lo valora.">
+  <div class="k rv">Por qué nuestra propuesta es distinta</div>
+  <h2 class="rv">Enseña el porqué, no solo el sí o el no</h2>
+  <div class="grid">
+    <div class="card rv"><h3>Muestra las consecuencias</h3><p>El campesino ve qué pasa con su corte.</p></div>
+    <div class="card rv"><h3>Acompaña el error</h3><p>Plan de acción personalizado, no solo una nota.</p></div>
+    <div class="card rv"><h3>Mide para mejorar</h3><p>Datos en Excel para que la empresa actúe.</p></div>
+    <div class="card rv"><h3>Pensado para el campo</h3><p>Sin internet y con la luz de la hora real.</p></div>
+  </div>
+  <p class="sub rv" style="font-size:.75em"><strong>Límites claros:</strong> prototipo con <span class="pend">[N]</span> fotos reales; las etiquetas las valida un experto.</p>
+</section>
+
+<section class="slide cierre" data-nota="Cierre emotivo y corto. Repetir la frase fuerza y agradecer.">
+  <div class="k rv">Tutor de Corte de Rosas</div>
+  <h1 class="rv">El robot acompaña.<br><span class="rosa">El campesino decide.</span></h1>
+  <p class="sub rv">Gracias.</p>
+</section>
+
+<div id="notas"></div>
+<div id="nav"><button id="ant" aria-label="Anterior">←</button><span id="pts" style="display:flex;gap:.4em;align-items:center"></span><button id="sig" aria-label="Siguiente">→</button></div>
+<div id="ayuda">← → cambiar · F pantalla completa · N notas</div>
+
+<script>
+const S = [...document.querySelectorAll(".slide")], pts = document.getElementById("pts"), notas = document.getElementById("notas");
+let i = 0;
+S.forEach((s, n) => {
+  [...s.querySelectorAll(".rv")].forEach((e, k) => e.style.setProperty("--i", k));
+  const p = document.createElement("span"); p.className = "pt"; p.onclick = () => ir(n); pts.appendChild(p);
+});
+function ir(n){
+  i = Math.max(0, Math.min(S.length - 1, n));
+  S.forEach((s, k) => { s.classList.toggle("active", k === i); s.classList.toggle("prev", k < i); });
+  [...pts.children].forEach((p, k) => p.classList.toggle("on", k === i));
+  document.getElementById("barra").style.width = ((i + 1) / S.length * 100) + "%";
+  notas.textContent = S[i].dataset.nota || ""; history.replaceState(null, "", "#" + (i + 1));
+}
+document.getElementById("ant").onclick = () => ir(i - 1);
+document.getElementById("sig").onclick = () => ir(i + 1);
+addEventListener("keydown", e => {
+  if(["ArrowRight", "PageDown", " ", "Enter"].includes(e.key)) { e.preventDefault(); ir(i + 1); }
+  if(["ArrowLeft", "PageUp", "Backspace"].includes(e.key)) { e.preventDefault(); ir(i - 1); }
+  if(e.key === "Home") ir(0); if(e.key === "End") ir(S.length - 1);
+  if(e.key.toLowerCase() === "n") notas.classList.toggle("on");
+  if(e.key.toLowerCase() === "f") document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen();
+});
+let x0 = null;
+addEventListener("touchstart", e => x0 = e.touches[0].clientX);
+addEventListener("touchend", e => { if(x0 !== null){ const d = e.changedTouches[0].clientX - x0; if(Math.abs(d) > 50) ir(i + (d < 0 ? 1 : -1)); x0 = null; } });
+ir((parseInt(location.hash.slice(1)) || 1) - 1);
+</script>
+</body>
+</html>
